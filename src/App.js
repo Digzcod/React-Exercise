@@ -1,25 +1,48 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react'
+import { Loading } from './loading'
 
-function App() {
+const api = "https://jsonplaceholder.typicode.com/posts"
+
+export default function App() {
+  const [loading, setLoading] = useState(false)
+  const [data, setData] = useState([])
+
+
+  const fetchData = async() => {
+    setLoading(true)
+    try {
+      const response = await fetch(api)
+      const source  =  await response.json()
+      setLoading(false)
+      setData(source)
+    } catch (error) {
+      setLoading(true)
+      console.log(error)
+    }
+  }
+
+useEffect(()=>{
+  fetchData()
+}, [])
+
+
+  if (loading) {
+    return <Loading/>
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+    <main>
+        <h1>Hello World! {data.length}</h1>
+        {data.map((data)=> {
+          const {id, title, body} = data
 
-export default App;
+          return(
+          <article key={id} className='blog'>
+            <h2 className='blog_title'>{title}</h2>
+            <p className='blog_info'>{body}</p>
+          </article>
+          )
+        })}
+    </main>
+  )
+}
